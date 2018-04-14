@@ -404,8 +404,6 @@ TEST_CASE_METHOD(CoherentUnitTestFixture, "test_grover")
 
     const int TARGET_PROB = 100;
 
-    
-
     // Our input to the subroutine "oracle" is 8 bits.
     qftReg->SetPermutation(0);
     qftReg->H(0, 8);
@@ -452,7 +450,7 @@ TEST_CASE_METHOD(CoherentUnitTestFixture, "test_grover_lookup")
     // Our input to the subroutine "oracle" is 8 bits.
     qftReg->SetPermutation(0);
     qftReg->H(8, 8);
-    qftReg->SuperposeReg8(8, 0, toLoad);
+    qftReg->SuperposedLDA(8, 8, 0, 8, toLoad);
 
     std::cout << "Iterations:" << std::endl;
     // Twelve iterations maximizes the probablity for 256 searched elements.
@@ -463,13 +461,13 @@ TEST_CASE_METHOD(CoherentUnitTestFixture, "test_grover_lookup")
         qftReg->INC(100, 0, 8);
         // This ends the "oracle."
         qftReg->X(16);
-        qftReg->SbcSuperposeReg8(8, 0, 16, toLoad);
+        qftReg->SuperposedSBC(8, 8, 0, 8, 16, toLoad);
         qftReg->X(16);
         qftReg->H(8, 8);
         qftReg->ZeroPhaseFlip(8, 8);
         qftReg->H(8, 8);
         qftReg->PhaseFlip();
-        qftReg->AdcSuperposeReg8(8, 0, 16, toLoad);
+        qftReg->SuperposedADC(8, 8, 0, 8, 16, toLoad);
         std::cout << "\t" << std::setw(2) << i << "> chance of match:" << qftReg->ProbAll(TARGET_PROB) << std::endl;
     }
 

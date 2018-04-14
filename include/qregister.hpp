@@ -909,6 +909,7 @@ public:
      * at a time.
      */
     virtual unsigned char SuperposeReg8(bitLenInt inputStart, bitLenInt outputStart, unsigned char* values);
+    virtual unsigned char SuperposedLDA(bitLenInt indexStart, bitLenInt indexLength, bitLenInt valueStart, bitLenInt valueLength, unsigned char* values);
 
     /**
      * Add to entangled 8 bit register state with a superposed
@@ -936,6 +937,7 @@ public:
      */
     virtual unsigned char AdcSuperposeReg8(
         bitLenInt inputStart, bitLenInt outputStart, bitLenInt carryIndex, unsigned char* values);
+    virtual unsigned char SuperposedADC(bitLenInt indexStart, bitLenInt indexLength, bitLenInt valueStart, bitLenInt valueLength, bitLenInt carryIndex, unsigned char* values);
 
     /**
      * Subtract from an entangled 8 bit register state with a superposed
@@ -961,8 +963,8 @@ public:
      * (with carry) operations on a state usually initially prepared with
      * SuperposeReg8().
      */
-    virtual unsigned char SbcSuperposeReg8(
-        bitLenInt inputStart, bitLenInt outputStart, bitLenInt carryIndex, unsigned char* values);
+    virtual unsigned char SbcSuperposeReg8(bitLenInt inputStart, bitLenInt outputStart, bitLenInt carryIndex, unsigned char* values);
+    virtual unsigned char SuperposedSBC(bitLenInt indexStart, bitLenInt indexLength, bitLenInt valueStart, bitLenInt valueLength, bitLenInt carryIndex, unsigned char* values);
 
     /**
      * Direct measure of bit probability to be in |1> state

@@ -976,6 +976,23 @@ unsigned char SeparatedUnit::SuperposeReg8(bitLenInt inputStart, bitLenInt outpu
         qubitLookup[inputStart].qb, qubitLookup[outputStart].qb, values);
 }
 
+unsigned char SeparatedUnit::SuperposedLDA(bitLenInt indexStart, bitLenInt indexLength, bitLenInt valueStart, bitLenInt valueLength, unsigned char* values)
+{
+    std::vector<QbListEntry> qbListInput(indexLength);
+    GetParallelBitList(indexStart, indexLength, qbListInput);
+    std::vector<QbListEntry> qbListOutput(valueLength);
+    GetParallelBitList(valueStart, valueLength, qbListOutput);
+    std::vector<QbListEntry> qbList(qbListInput.size() + qbListOutput.size());
+    std::copy(qbListInput.begin(), qbListInput.end(), qbList.begin());
+    std::copy(qbListOutput.begin(), qbListOutput.end(), qbList.begin() + qbListInput.size());
+    OptimizeParallelBitList(qbList);
+
+    EntangleBitList(qbList);
+
+    return coherentUnits[qubitLookup[indexStart].cu]->SuperposedLDA(
+        qubitLookup[indexStart].qb, indexLength, qubitLookup[valueStart].qb, valueLength, values);
+}
+
 /**
  * Add to entangled 8 bit register state with a superposed
  * index-offset-based read from classical memory
@@ -1023,6 +1040,28 @@ unsigned char SeparatedUnit::AdcSuperposeReg8(
         qubitLookup[inputStart].qb, qubitLookup[outputStart].qb, qubitLookup[carryIndex].qb, values);
 }
 
+unsigned char SeparatedUnit::SuperposedADC(bitLenInt indexStart, bitLenInt indexLength, bitLenInt valueStart, bitLenInt valueLength, bitLenInt carryIndex, unsigned char* values)
+{
+    QbListEntry carryQbe;
+    std::vector<QbListEntry> qbListInput(indexLength);
+    GetParallelBitList(indexStart, indexLength, qbListInput);
+    std::vector<QbListEntry> qbListOutput(valueLength);
+    GetParallelBitList(valueStart, valueLength, qbListOutput);
+    std::vector<QbListEntry> qbList(qbListInput.size() + qbListOutput.size() + 1);
+    std::copy(qbListInput.begin(), qbListInput.end(), qbList.begin());
+    std::copy(qbListOutput.begin(), qbListOutput.end(), qbList.begin() + qbListInput.size());
+    carryQbe.cu = qubitLookup[carryIndex].cu;
+    carryQbe.start = qubitLookup[carryIndex].qb;
+    carryQbe.length = 1;
+    qbList[qbList.size() - 1] = carryQbe;
+    OptimizeParallelBitList(qbList);
+
+    EntangleBitList(qbList);
+
+    return coherentUnits[qubitLookup[indexStart].cu]->SuperposedADC(
+        qubitLookup[indexStart].qb, indexLength, qubitLookup[valueStart].qb, valueLength, qubitLookup[carryIndex].qb, values);
+}
+
 /**
  * Subtract from an entangled 8 bit register state with a superposed
  * index-offset-based read from classical memory
@@ -1068,6 +1107,30 @@ unsigned char SeparatedUnit::SbcSuperposeReg8(
 
     return coherentUnits[qubitLookup[inputStart].cu]->SbcSuperposeReg8(
         qubitLookup[inputStart].qb, qubitLookup[outputStart].qb, qubitLookup[carryIndex].qb, values);
+}
+
+unsigned char SeparatedUnit::SuperposedSBC(bitLenInt indexStart, bitLenInt indexLength, bitLenInt valueStart, bitLenInt valueLength, bitLenInt carryIndex, unsigned char* values)
+{
+    QbListEntry carryQbe;
+    std::vector<QbListEntry> qbListInput(indexLength);
+    GetParallelBitList(indexStart, indexLength, qbListInput);
+    std::vector<QbListEntry> qbListOutput(valueLength);
+    GetParallelBitList(valueStart, valueLength, qbListOutput);
+    std::vector<QbListEntry> qbList(qbListInput.size() + qbListOutput.size() + 1);
+    std::copy(qbListInput.begin(), qbListInput.end(), qbList.begin());
+    std::copy(qbListOutput.begin(), qbListOutput.end(), qbList.begin() + qbListInput.size());
+    carryQbe.cu = qubitLookup[carryIndex].cu;
+    carryQbe.start = qubitLookup[carryIndex].qb;
+    carryQbe.length = 1;
+    qbList[qbList.size() - 1] = carryQbe;
+    OptimizeParallelBitList(qbList);
+
+    EntangleBitList(qbList);
+
+    EntangleBitList(qbList);
+
+    return coherentUnits[qubitLookup[indexStart].cu]->SuperposedSBC(
+        qubitLookup[indexStart].qb, indexLength, qubitLookup[valueStart].qb, valueLength, qubitLookup[carryIndex].qb, values);
 }
 
 /**
