@@ -488,6 +488,13 @@ void SeparatedUnit::X(bitLenInt start, bitLenInt length)
     }
 }
 
+void SeparatedUnit::Z(bitLenInt start, bitLenInt length)
+{
+    for (bitLenInt i = 0; i < length; i++) {
+        Z(start + i);
+    }
+}
+
 void SeparatedUnit::CY(bitLenInt control, bitLenInt target)
 {
     std::vector<bitLenInt> indices(2);

@@ -136,6 +136,8 @@ public:
 
     void X(bitLenInt start, bitLenInt length);
 
+    void Z(bitLenInt start, bitLenInt length);
+
     void CY(bitLenInt control, bitLenInt target);
 
     void CZ(bitLenInt control, bitLenInt target);

@@ -1041,6 +1041,39 @@ void CoherentUnit::X(bitLenInt start, bitLenInt length)
     ResetStateVec(std::move(nStateVec));
 }
 
+/// Apply Pauli Y matrix to each bit
+void CoherentUnit::Y(bitLenInt start, bitLenInt length)
+{
+    for (bitLenInt lcv = 0; lcv < length; lcv++) {
+        Y(start + lcv);
+    }
+}
+
+/// Apply Pauli Z matrix to each bit
+void CoherentUnit::Z(bitLenInt start, bitLenInt length)
+{
+    // First, single bit operations are better optimized for this special case:
+    if (length == 1) {
+        Z(start);
+        return;
+    }
+
+    bitCapInt inOutMask = ((1 << length) - 1) << start;
+    bitCapInt otherMask = ((1 << qubitCount) - 1) ^ inOutMask;
+    std::unique_ptr<Complex16[]> nStateVec(new Complex16[maxQPower]);
+    par_for(0, maxQPower, [&](const bitCapInt lcv) {
+        bitCapInt otherRes = lcv & otherMask;
+        bitCapInt inOutRes = lcv & inOutMask;
+        bitCapInt inOutInt = inOutRes >> start;
+        bitLenInt bitCount;
+        for (bitCount = 0; inOutInt; bitCount++) {
+            inOutInt &= inOutInt - 1;  
+        }
+        nStateVec[inOutRes | otherRes] = (bitCount & 1) ? -stateVec[lcv] : stateVec[lcv];
+    });
+    ResetStateVec(std::move(nStateVec));
+}
+
 /// Bitwise swap
 void CoherentUnit::Swap(bitLenInt start1, bitLenInt start2, bitLenInt length)
 {
@@ -1169,22 +1202,6 @@ void CoherentUnit::RZDyad(int numerator, int denominator, bitLenInt start, bitLe
 {
     for (bitLenInt lcv = 0; lcv < length; lcv++) {
         RZDyad(numerator, denominator, start + lcv);
-    }
-}
-
-/// Apply Pauli Y matrix to each bit
-void CoherentUnit::Y(bitLenInt start, bitLenInt length)
-{
-    for (bitLenInt lcv = 0; lcv < length; lcv++) {
-        Y(start + lcv);
-    }
-}
-
-/// Apply Pauli Z matrix to each bit
-void CoherentUnit::Z(bitLenInt start, bitLenInt length)
-{
-    for (bitLenInt lcv = 0; lcv < length; lcv++) {
-        Z(start + lcv);
     }
 }
 
